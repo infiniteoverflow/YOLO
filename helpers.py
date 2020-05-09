@@ -1,4 +1,5 @@
 import torch
+import time
 
 # Funtion to load classnames from a text document
 def load_class_names(file):
@@ -51,7 +52,7 @@ def boxes_iou(box1,box2):
 def nms(boxes,iou_thresh):
     '''Funtion to calculate the Non-Maximal suppression
        between two boxes'''
-       
+
     if(len(boxes) == 0):
         return boxes
 
@@ -74,3 +75,23 @@ def nms(boxes,iou_thresh):
                 if boxes_iou(box_i,box_j) > iou_thresh:
                     box_j[4] = 0
     return best_boxes
+
+
+def detect_objects(model,img,iou_thresh,nms_thresh):
+    start = time.time()
+
+    model.eval()
+
+    img = torch.from_numpy(img.transpose(2,0,1)).float().div(255.0).unsqueeze(0)
+
+    list_boxes = model(img,nms_thresh)
+
+    boxes = list_boxes[0][0] + list_boxes[1][0] + list_boxes[2][0]
+    boxes = nms(boxes,iou_thresh)
+
+    finish = time.time()
+
+    print("No. of Objects detected: {}".format(len(boxes)))
+    print('Time Taken: {} sec'.format((finish-start)))
+
+    return boxes
