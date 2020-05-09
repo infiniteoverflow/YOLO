@@ -15,66 +15,56 @@ def load_class_names(file):
         class_names.append(line)
     return class_names
 
-def boxes_iou(box1, box2):
-  
-    # Get the Width and Height of each bounding box
+def boxes_iou(box1,box2):
+    ''' Function to calculate the Intersection Of Union of two given
+    bounding boxes'''
+
     width_box1 = box1[2]
     height_box1 = box1[3]
     width_box2 = box2[2]
     height_box2 = box2[3]
-    
-    # Calculate the area of the each bounding box
-    area_box1 = width_box1 * height_box1
-    area_box2 = width_box2 * height_box2
-    
-    # Find the vertical edges of the union of the two bounding boxes
-    mx = min(box1[0] - width_box1/2.0, box2[0] - width_box2/2.0)
-    Mx = max(box1[0] + width_box1/2.0, box2[0] + width_box2/2.0)
-    
-    # Calculate the width of the union of the two bounding boxes
-    union_width = Mx - mx
-    
-    # Find the horizontal edges of the union of the two bounding boxes
-    my = min(box1[1] - height_box1/2.0, box2[1] - height_box2/2.0)
-    My = max(box1[1] + height_box1/2.0, box2[1] + height_box2/2.0)    
-    
-    # Calculate the height of the union of the two bounding boxes
-    union_height = My - my
-    
-    # Calculate the width and height of the area of intersection of the two bounding boxes
+
+    area_box1 = width_box1*height_box1
+    area_box2 = width_box2*height_box2
+
+    mx = min(box1[0]-width_box1/2.0 , box2[0]-width_box2/2.0)
+    Mx = max(box1[0]+width_box1/2.0,box2[0]+width_box2/2.0)
+
+    union_width = Mx-mx
+
+    my = min(box1[1]-height_box1/2.0 , box2[1]-height_box2/2.0)
+    My = max(box1[1]+height_box1/2.0,box2[1]+height_box2/2.0)
+
+    union_height = My-my
+
     intersection_width = width_box1 + width_box2 - union_width
     intersection_height = height_box1 + height_box2 - union_height
-   
-    # If the the boxes don't overlap then their IOU is zero
-    if intersection_width <= 0 or intersection_height <= 0:
+
+    if intersection_width<=0 or intersection_height<=0:
         return 0.0
 
-    # Calculate the area of intersection of the two bounding boxes
-    intersection_area = intersection_width * intersection_height
-    
-    # Calculate the area of the union of the two bounding boxes
+    intersection_area = intersection_height*intersection_width
+
     union_area = area_box1 + area_box2 - intersection_area
-    
-    # Calculate the IOU
+
     iou = intersection_area/union_area
-    
+
     return iou
 
 
+def nms(boxes,iou_thresh):
+    '''Funtion to calculate the Non-Maximal suppression
+       between two boxes'''
 
-def nms(boxes, iou_thresh):
-    
-    # If there are no bounding boxes do nothing
-    if len(boxes) == 0:
+    if(len(boxes) == 0):
         return boxes
 
-    det_confs = torch.zeros(len(boxes))
-    
-    # Get the detection confidence of each predicted bounding box
-    for i in range(len(boxes)):
-        det_confs[i] = boxes[i][4]
+    det_cnfs = torch.zeros(len(boxes))
 
-    _,sortIds = torch.sort(det_confs,descending=True)
+    for i in range(len(boxes)):
+        det_cnfs[i] = boxes[i][4]
+
+    _,sortIds = torch.sort(det_cnfs,descending=True)
 
     best_boxes = []
 
