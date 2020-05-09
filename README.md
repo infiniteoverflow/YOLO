@@ -1,6 +1,9 @@
 # YOLO
 Implementation of the YOLO(You Only Look Once) algorithm
 
+![](images/screenshot.png)
+
+
 ## Object Detection
 
 Once the image has been loaded and resized, and you have chosen your parameters for `nms_thresh` and `iou_thresh`, we can use the YOLO algorithm to detect objects in the image. We detect the objects using the `detect_objects(m, resized_image, iou_thresh, nms_thresh)`function from the `utils` module. This function takes in the model `m` returned by *Darknet*, the resized image, and the NMS and IOU thresholds, and returns the bounding boxes of the objects found.
@@ -25,4 +28,3 @@ After removing all the predicted bounding boxes that have a low detection probab
 
 In the `helpers` module you will find the `nms` function, that performs the second step of Non-Maximal Suppression, and the `boxes_iou` function that calculates the Intersection over Union of two given bounding boxes. You are encouraged to look at these functions to see how they work. 
 
-![](images/screenshot)
