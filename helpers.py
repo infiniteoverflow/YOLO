@@ -1,3 +1,5 @@
+import torch
+
 # Funtion to load classnames from a text document
 def load_class_names(file):
     class_names = []
@@ -44,3 +46,31 @@ def boxes_iou(box1,box2):
     iou = intersection_area/union_area
 
     return iou
+
+
+def nms(boxes,iou_thresh):
+    '''Funtion to calculate the Non-Maximal suppression
+       between two boxes'''
+       
+    if(len(boxes) == 0):
+        return boxes
+
+    det_cnfs = torch.zeros(len(boxes))
+
+    for i in range(len(boxes)):
+        det_cnfs[i] = boxes[i][4]
+
+    _,sortIds = torch.sort(det_cnfs,descending=True)
+
+    best_boxes = []
+
+    for i in range(len(boxes)):
+        box_i = boxes[sortIds[i]]
+
+        if box_i[4] > 0:
+            best_boxes.append(box_i)
+            for j in range(i+1,len(boxes)):
+                box_j = boxes[sortIds[i]]
+                if boxes_iou(box_i,box_j) > iou_thresh:
+                    box_j[4] = 0
+    return best_boxes
